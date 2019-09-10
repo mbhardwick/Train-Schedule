@@ -39,5 +39,11 @@ dataRef.ref().on("child_added", function(childSnapshot) {
     console.log(childSnapshot.val().destination);
     console.log(childSnapshot.val().departure);
     console.log(childSnapshot.val().frequency);
+    //Propogate list
+    $('#train-list').prepend('<tr><td scope="row" class="name">'+childSnapshot.val().name+
+    '</th><td class="destination">'+childSnapshot.val().destination+'</td><td class="frequency">'+childSnapshot.val().frequency+'</td></tr>');
+    // <td class= "nextArrival">'+childSnapshot.val().nextArrival+'</td><td class="minAway>'+childSnapshot.val().minAway+'</td></tr>')
+}, function(errorObject) {
+    console.log("Errors handled: "+errorObject.code);
 });
 
