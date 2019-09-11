@@ -29,9 +29,18 @@ $('#add-train').on('click',function(event) {
         name:name,
         destination:destination,
         departure:departure,
-        frequency:frequency
+        frequency:frequency,
+        dateAdded:firebase.database.ServerValue.TIMESTAMP
     });
+
+    //clear text box
+    $('#name-input').val('');
+    $('#destination-input').val('');
+    $('#departure-input').val('');
+    $('#frequency-input').val('');
 });
+
+
 
 //Firebase watch and initial load
 dataRef.ref().on("child_added", function(childSnapshot) {
@@ -39,11 +48,30 @@ dataRef.ref().on("child_added", function(childSnapshot) {
     console.log(childSnapshot.val().destination);
     console.log(childSnapshot.val().departure);
     console.log(childSnapshot.val().frequency);
-    //Propogate list
-    $('#train-list').prepend('<tr><td scope="row" class="name">'+childSnapshot.val().name+
-    '</th><td class="destination">'+childSnapshot.val().destination+'</td><td class="frequency">'+childSnapshot.val().frequency+'</td></tr>');
-    // <td class= "nextArrival">'+childSnapshot.val().nextArrival+'</td><td class="minAway>'+childSnapshot.val().minAway+'</td></tr>')
+
+
+    //First Time
+    var firstTimeConverted = moment(departure, "HH:mm").subtract(1, "years");
+    console.log(firstTimeConverted);
+    //Current Time
+    var currentTime = moment();
+    console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
+    //Difference Between Times
+    var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
+    console.log("DIFFERENCE IN TIME: "+diffTime);
+    //Time apart
+    var tRemainder = diffTime % frequency;
+    console.log(tRemainder);
+    //Minutes Until Train
+    var minAway = frequency - tRemainder;
+    console.log("MINUTES TILL TRAIN: " + minAway);
+    // Next Train
+    var nextArrival = moment().add(minAway, "minutes");
+    var nextArrivalFormat = moment(nextArrival).format("hh:mm");
+    console.log("ARRIVAL TIME: " + nextArrivalFormat);
+    //Propogate Train list
+    $('#train-list').prepend('<tr><td scope="row" class="name">'+childSnapshot.val().name+'</th><td class="destination">'+childSnapshot.val().destination+'</td><td class="frequency">'+childSnapshot.val().frequency+
+    '</td><td class= "nextArrival">'+nextArrivalFormat+'</td><td class="minAway">'+minAway+'</td></tr>')
 }, function(errorObject) {
     console.log("Errors handled: "+errorObject.code);
 });
-
