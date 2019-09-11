@@ -19,7 +19,6 @@ var frequency = 0;
 
 $('#add-train').on('click',function(event) {
     event.preventDefault();
-    console.log('click');
     name = $('#name-input').val().trim();
     destination = $('#destination-input').val().trim();
     departure = $('#departure-input').val().trim();
@@ -44,33 +43,26 @@ $('#add-train').on('click',function(event) {
 
 //Firebase watch and initial load
 dataRef.ref().on("child_added", function(childSnapshot) {
-    console.log(childSnapshot.val().name);
-    console.log(childSnapshot.val().destination);
-    console.log(childSnapshot.val().departure);
-    console.log(childSnapshot.val().frequency);
 
+    // Snapshot Data to Variables
+    var nameDisplay = (childSnapshot.val().name);
+    var destinationDisplay = (childSnapshot.val().destination);
+    var departureDisplay = (childSnapshot.val().departure);
+    var frequencyDisplay = (childSnapshot.val().frequency);
 
     //First Time
-    var firstTimeConverted = moment(departure, "HH:mm").subtract(1, "years");
-    console.log(firstTimeConverted);
-    //Current Time
-    var currentTime = moment();
-    console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
+    var firstTimeConverted = moment(departureDisplay, "HH:mm").subtract(1, "years");
     //Difference Between Times
     var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
-    console.log("DIFFERENCE IN TIME: "+diffTime);
     //Time apart
-    var tRemainder = diffTime % frequency;
-    console.log(tRemainder);
+    var tRemainder = diffTime % frequencyDisplay;
     //Minutes Until Train
-    var minAway = frequency - tRemainder;
-    console.log("MINUTES TILL TRAIN: " + minAway);
+    var minAway = frequencyDisplay - tRemainder;
     // Next Train
     var nextArrival = moment().add(minAway, "minutes");
     var nextArrivalFormat = moment(nextArrival).format("hh:mm");
-    console.log("ARRIVAL TIME: " + nextArrivalFormat);
     //Propogate Train list
-    $('#train-list').prepend('<tr><td scope="row" class="name">'+childSnapshot.val().name+'</th><td class="destination">'+childSnapshot.val().destination+'</td><td class="frequency">'+childSnapshot.val().frequency+
+    $('#train-list').prepend('<tr><td scope="row" class="name">'+nameDisplay+'</th><td class="destination">'+destinationDisplay+'</td><td class="frequency">'+frequencyDisplay+
     '</td><td class= "nextArrival">'+nextArrivalFormat+'</td><td class="minAway">'+minAway+'</td></tr>')
 }, function(errorObject) {
     console.log("Errors handled: "+errorObject.code);
